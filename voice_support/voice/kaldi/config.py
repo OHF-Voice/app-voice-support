@@ -15,6 +15,7 @@ from typing import Any
 
 import yaml
 
+from ..protocol import wake_word_matches
 from .lexicon import LexiconError, ModelLexicon
 
 _LOGGER = logging.getLogger(__name__)
@@ -219,7 +220,13 @@ class ServiceConfig:
 
     def resolve(self, name: str) -> WakeWordConfig | None:
         """Look up a name from a `detect` message."""
-        return self.by_name.get(name) or self.by_name.get(_normalize_name(name))
+        exact = self.by_name.get(name) or self.by_name.get(_normalize_name(name))
+        if exact is not None:
+            return exact
+
+        # A phrase may name more than the wake word, see wake_word_matches. The longest name wins.
+        named = [key for key in self.by_name if wake_word_matches(name, key)]
+        return self.by_name[max(named, key=len)] if named else None
 
 
 def _normalize_name(name: str) -> str:

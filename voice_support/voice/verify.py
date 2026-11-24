@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from .protocol import WakeWordInfo, normalize_wake_word
+from .protocol import WakeWordInfo, wake_word_matches
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,8 +82,7 @@ class Verifier(ABC):
         Home Assistant names it by the phrase said; the configuration names
         it by an id. Both spellings resolve to the same wake word.
         """
-        wanted = normalize_wake_word(wake_word)
-        return any(normalize_wake_word(w.id) == wanted for w in self.wake_words)
+        return any(wake_word_matches(wake_word, w.id) for w in self.wake_words)
 
     async def start(self) -> None:
         """Load whatever has to be resident. Raises to refuse to run."""
