@@ -12,6 +12,7 @@ is detected, to decide whether to ask satellites for wake word audio.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -198,6 +199,13 @@ def normalize_wake_word(wake_word: str) -> str:
         for c in wake_word.lower().replace("-", "_").replace(" ", "_")
         if c.isalnum() or c == "_"
     )
+
+
+def wake_word_matches(phrase: str, wake_word: str) -> bool:
+    """Whether a phrase names a wake word: the wake word is in it, with any
+    text before or after, so "Kitchen - Okay Nabu" names "okay_nabu"."""
+    wanted = normalize_wake_word(wake_word)
+    return re.search(f".*{re.escape(wanted)}.*", normalize_wake_word(phrase)) is not None
 
 
 def _optional_str(value: Any) -> str | None:

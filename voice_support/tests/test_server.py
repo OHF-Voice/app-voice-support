@@ -18,6 +18,7 @@ from voice.protocol import (  # noqa: E402
     WakeWordInfo,
     ms_to_bytes,
     normalize_wake_word,
+    wake_word_matches,
 )
 from voice.server import build_app  # noqa: E402
 from voice.verify import MoreAudio, Verdict, Verifier  # noqa: E402
@@ -328,6 +329,48 @@ def test_a_run_that_starts_at_speech_is_still_endpointed(monkeypatch):
 )
 def test_one_wake_word_many_spellings(spelling):
     assert normalize_wake_word(spelling) == "okay_nabu"
+
+
+@pytest.mark.parametrize(
+    "phrase, wake_word, matches",
+    [
+        ("okay nabu", "okay_nabu", True),
+        ("Okay Nabu", "okay-nabu", True),
+        ("Internal - MWW - Okay Nabu", "okay_nabu", True),
+        ("Download - OWW - Okay Nabu", "okay_nabu", True),
+        ("Internal - MWW - Hey Jarvis", "hey_jarvis", True),
+        ("Internal - MWW - Hey Jarvis", "okay_nabu", False),
+        ("okay nabu please", "okay_nabu", True),
+        ("so okay nabu", "okay_nabu", True),
+        ("Internal - MWW - Hey Jarvis - 2", "hey_jarvis", True),
+        ("nabu", "okay_nabu", False),
+    ],
+)
+def test_a_phrase_names_a_wake_word_with_any_text_around_it(phrase, wake_word, matches):
+    assert wake_word_matches(phrase, wake_word) is matches
+
+
+class HeyJarvisVerifier(FakeVerifier):
+    @property
+    def wake_words(self):
+        return [WakeWordInfo(id="hey_jarvis", phrase="hey jarvis")]
+
+
+def test_a_phrase_with_more_in_front_is_verified_as_the_wake_word():
+    verifier = HeyJarvisVerifier([Verdict(accepted=True, wake_word_audio_ms=940)])
+    start = RunStart(wake_word_phrase="Internal - MWW - Hey Jarvis", wake_word_audio_ms=WAKE_MS)
+    events = run(_run(verifier, start=start))
+
+    assert [request.wake_word_phrase for request, _, _ in verifier.seen] == ["Internal - MWW - Hey Jarvis"]
+    assert events == [
+        {
+            "type": "wake-word-end",
+            "wake_word_output": {
+                "wake_word_phrase": "Internal - MWW - Hey Jarvis",
+                "wake_word_audio_ms": 940,
+            },
+        }
+    ]
 
 
 def test_knows_only_what_it_has():

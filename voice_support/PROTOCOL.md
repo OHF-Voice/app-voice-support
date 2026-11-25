@@ -73,6 +73,9 @@ wedges then takes nothing else with it.
 }
 ```
 
+A phrase may have more text before or after the wake word. It names a wake
+word when the wake word is in it. The app answers with the phrase it was given.
+
 The wake word fields are absent when there is no wake word stage — a button
 press, or a satellite that starts at speech-to-text — and the app then only
 endpoints. `silence_seconds` is the user's VAD sensitivity, already resolved
