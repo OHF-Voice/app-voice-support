@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.2.1
 
 - Runs on x86-64 CPUs without AVX2, such as the Dell Optiplex 990's Sandy
   Bridge: pysilero-vad 3.4.0 required AVX2, FMA and F16C and crashed the app
   at startup without them. 3.4.1 picks its instructions at runtime.
+- A wake word rejected as `confusable` names the word that beat it in the
+  log: "okay nabu: rejected (confusable: 'naruto')".
 
 ## 0.2.0
 
