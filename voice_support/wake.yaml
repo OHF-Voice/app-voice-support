@@ -144,9 +144,12 @@ wake_words:
     phrases:
       - okay nabu
 
-    # Per-wake-word threshold overrides go here, e.g.
-    #   thresholds:
-    #     theta_competitor: 0.10
+    # Local tuning: far-field wakes were rejected as `confusable` by whichever
+    # generated near-neighbour of "nabu" (nabo, navu, naba, nahbu...) happened
+    # to edge ahead, so pruning entries only moved the blame. Recorded false
+    # wakes start at 0.18 ("okay naru"), so stay below that.
+    thresholds:
+      theta_competitor: 0.16
     #
     # These defaults are calibrated for a real voice at the device. Playing a
     # recording through loudspeakers across a room is a doubly-degraded path
@@ -223,8 +226,8 @@ wake_words:
       - okay nahbu
       - okay nalu
       - okay name
-      - okay namu
       - okay nancy
+      - okay namu
       - okay nanu
       - okay naomi
       - okay napkin
@@ -232,11 +235,11 @@ wake_words:
       - okay naru
       - okay naruto
       - okay nasu
+      - okay navu
       - okay natalie
       - okay natasha
       - okay nathan
       - okay nature
-      - okay navu
       - okay near
       - okay nebula
       - okay need
