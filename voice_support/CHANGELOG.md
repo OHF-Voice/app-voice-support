@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Runs on x86-64 CPUs without AVX2, such as the Dell Optiplex 990's Sandy
+  Bridge: pysilero-vad 3.4.0 required AVX2, FMA and F16C and crashed the app
+  at startup without them. 3.4.1 picks its instructions at runtime.
+
 ## 0.2.0
 
 - A second opinion from Parakeet's CTC head on a wake word Kaldi refused as
